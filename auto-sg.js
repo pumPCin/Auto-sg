@@ -88,10 +88,10 @@ call = 0;
 })
 .finally(() => {
 if (call === 1) {
-console.log('Check cookie good');
+console.log('Session found');
 rq({
 method: 'GET',
-url: 'https://www.steamgifts.com/account/settings/profile',
+url: my_url + '/account/settings/profile',
 headers: {
 'authority': 'www.steamgifts.com',
 'from': 'esgst.extension@gmail.com',
@@ -99,11 +99,11 @@ headers: {
 'esgst-version': '8.8.5',
 'content-type': 'application/x-www-form-urlencoded',
 'accept': '*/*',
-'origin': 'https://www.steamgifts.com',
+'origin': my_url,
 'sec-fetch-site': 'same-origin',
 'sec-fetch-mode': 'cors',
 'sec-fetch-dest': 'empty',
-'referer': 'https://www.steamgifts.com/',
+'referer': my_url + '/',
 'cookie': my_cookie
 },
 responseType: 'document'
@@ -120,9 +120,15 @@ console.log('Account: ' + my_username + ' Level: ' + my_level + ' Points: ' + my
 joinService();
 }
 else {
-console.log('Check profile error');
+console.log('Connection error');
 }
 });
+}
+else if (call === 0) {
+console.log('Session not found');
+}
+else {
+console.log('Connection error');
 }
 });
 function joinService() {
@@ -184,7 +190,8 @@ if (isNaN(sgwon)) {
 sgwon = 0;
 }
 if (sgwon > 0) {
-console.log('!!! You win !!! (quantity: ' + sgwon + ')');
+console.log('!!! Congrats, you won !!! (quantity: ' + sgwon + ')');
+fs.writeFile('win.txt', new Date().toLocaleTimeString() + ' ' + new Date().toLocaleDateString() + sgwon + '\n', (err) => { });
 }
 }
 data.find('.pinned-giveaways__outer-wrap').remove();
@@ -432,28 +439,28 @@ sgown = 1;
 console.log('Checking ' + sglog);
 switch (sgown) {
 case 1:
-console.log('Have on steam');
+console.log('Skipped - already have on Steam account');
 break;
 case 2:
-console.log('Steam data error');
+console.log('Skipped - Steam data not found (need steam app and sub data)');
 break;
 case 3:
-console.log('Points low');
+console.log('Skipped - not enough points');
 break;
 case 4:
-console.log('Blacklisted');
+console.log('Skipped - giveaway in Blacklist');
 break;
 case 5:
-console.log('Already joined');
+console.log('Skipped - already joined');
 break;
 case 6:
-console.log('Already joined, have_on_steam');
+console.log('Skipped - already joined, already have on Steam account');
 break;
 case 7:
-console.log('Points low (Points reserve - ' + points_reserve + ')');
+console.log('Skipped - not enough points (Reserve of points - ' + points_reserve + ')');
 break;
 case 8:
-console.log('Skipped by settings');
+console.log('Skipped - giveaway does not fit the service settings');
 break;
 }
 if (sgown === 6 && remove_ga) {
@@ -479,7 +486,7 @@ data: 'xsrf_token=' + my_token + '&do=entry_delete&code=' + GA.code
 .then((data) => {
 data = data.data;
 if (data.type === 'success') {
-console.log('Removed '+ GA.nam);
+console.log('Completed to remove giveaway - '+ GA.nam);
 my_value = data.points;
 GA.entered = false;
 }
@@ -507,7 +514,7 @@ headers: {
 data: 'xsrf_token=' + my_token + '&do=hide_giveaways_by_game_id&game_id=' + GA.gameid
 })
 .then(() => {
-console.log('Hided ' + GA.nam);
+console.log('Completed to hide on site giveaways - ' + GA.nam);
 my_dsave = my_dsave + sgid + ',';
 });
 }
@@ -548,13 +555,13 @@ my_value = data.points;
 GA.entered = true;
 }
 else {
-console.log('Join error ' + sglog);
+console.log('Skipped - failed to join giveaway due to an error');
 }
 });
 }
 else {
 if (sgown === 0) {
-console.log('Skipped by settings');
+console.log('Skipped - giveaway does not fit the service settings');
 }
 if (sgown !== 6) {
 sgnext = 50;
