@@ -11,6 +11,7 @@
   "author": "pumPCin",
   "license": "MIT",
   "bin": {
-  "auto-sg": "auto-sg.js"
+  "auto-sg": "auto-sg.js",
+  "update-data": "update-data.js"
   }
 }
