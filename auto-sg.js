@@ -329,22 +329,38 @@ sga = my_giveaways.filter(GA => GA.white === true);
 sgb = my_giveaways.filter(GA => GA.white === false);
 my_giveaways = [].concat(sga, sgb);
 }
-if (whitelist_only) {
+if (whitelist_only && !wishlist_only && !group_only) {
 sga = my_giveaways.filter(GA => GA.white === true);
 my_giveaways = sga;
 }
-if (wishlist_only && !group_only) {
+if (whitelist_only && wishlist_only && !group_only) {
+sga = my_giveaways.filter(GA => GA.white === true);
+sgb = my_giveaways.filter(GA => GA.type === 'w');
+my_giveaways = [].concat(sga, sgb);
+}
+if (whitelist_only && !wishlist_only && group_only) {
+sga = my_giveaways.filter(GA => GA.white === true);
+sgb = my_giveaways.filter(GA => GA.type === 'g');
+my_giveaways = [].concat(sga, sgb);
+}
+if (!whitelist_only && wishlist_only && !group_only) {
 sga = my_giveaways.filter(GA => GA.type === 'w');
 my_giveaways = sga;
 }
-if (group_only && !wishlist_only) {
+if (!whitelist_only && !wishlist_only && group_only) {
 sga = my_giveaways.filter(GA => GA.type === 'g');
 my_giveaways = sga;
 }
-if (wishlist_only && group_only) {
+if (!whitelist_only && wishlist_only && group_only) {
 sga = my_giveaways.filter(GA => GA.type === 'w');
 sgb = my_giveaways.filter(GA => GA.type === 'g');
 my_giveaways = [].concat(sga, sgb);
+}
+if (whitelist_only && wishlist_only && group_only) {
+sga = my_giveaways.filter(GA => GA.white === true);
+sgb = my_giveaways.filter(GA => GA.type === 'w');
+sgc = my_giveaways.filter(GA => GA.type === 'g');
+my_giveaways = [].concat(sga, sgb, sgc);
 }
 function processOne() {
 if (my_giveaways.length <= sgcurr) {
@@ -387,6 +403,7 @@ if (my_value < GA.cost && GA.cost > 0) {
 sgown = 3;
 }
 if (
+(!GA.white) && 
 (GA.type === 'p') &&
 (points_reserve > 0) &&
 ((my_value - GA.cost) < points_reserve) &&
@@ -397,7 +414,7 @@ sgown = 7;
 }
 if (
 (GA.type !== 'w' && !GA.white && GA.dlc && skip_dlc) ||
-(GA.type !== 'w' && !GA.white && GA.card && card_only)
+(GA.type !== 'w' && !GA.white && !GA.card && card_only)
 )
 {
 sgown = 8;
@@ -433,6 +450,9 @@ if (GA.card) {
 sglog = '♦ ' + sglog;
 }
 sglog = '|' + GA.page + '#|' + GA.order + '№|'+ GA.copies + 'x|' + GA.entries + 'e|' + GA.chance + '%|' + GA.level + 'L|' + GA.cost + '$| ' + sglog;
+if (GA.white) {
+sglog = '[w] ' + sglog;
+}
 if (my_dsave.includes(',' + sgid + ',') && sgown !== 6) {
 sgown = 1;
 }
@@ -520,12 +540,12 @@ my_dsave = my_dsave + sgid + ',';
 }
 if (
 (sgown === 0) &&
-(GA.type === 'w' && ignore_on_wish || GA.type === 'g' && ignore_on_group || max_level === 0 || GA.level >= min_level && GA.level <= max_level && max_level > 0) &&
-(GA.type === 'w' && ignore_on_wish || GA.type === 'g' && ignore_on_group || GA.cost >= min_cost || GA.cost === 0 && free_ga) &&
-(GA.type === 'w' && ignore_on_wish || GA.type === 'g' && ignore_on_group || max_cost === 0 || GA.cost <= max_cost) &&
-(GA.type === 'w' && ignore_on_wish || GA.type === 'g' && ignore_on_group || GA.type === 'w' && reserve_on_wish || GA.type === 'g' && reserve_on_group || (my_value - GA.cost) >= points_reserve || GA.cost === 0) &&
-(GA.type === 'w' && ignore_on_wish || GA.type === 'g' && ignore_on_group || min_chance === 0 || GA.chance >= min_chance) &&
-(GA.type === 'w' && ignore_on_wish || GA.type === 'g' && ignore_on_group || min_entries === 0 || GA.entries >= min_entries)
+(GA.white || GA.type === 'w' && ignore_on_wish || GA.type === 'g' && ignore_on_group || max_level === 0 || GA.level >= min_level && GA.level <= max_level && max_level > 0) &&
+(GA.white || GA.type === 'w' && ignore_on_wish || GA.type === 'g' && ignore_on_group || GA.cost >= min_cost || GA.cost === 0 && free_ga) &&
+(GA.white || GA.type === 'w' && ignore_on_wish || GA.type === 'g' && ignore_on_group || max_cost === 0 || GA.cost <= max_cost) &&
+(GA.white || GA.type === 'w' && ignore_on_wish || GA.type === 'g' && ignore_on_group || GA.type === 'w' && reserve_on_wish || GA.type === 'g' && reserve_on_group || (my_value - GA.cost) >= points_reserve || GA.cost === 0) &&
+(GA.white || GA.type === 'w' && ignore_on_wish || GA.type === 'g' && ignore_on_group || min_chance === 0 || GA.chance >= min_chance) &&
+(GA.white || GA.type === 'w' && ignore_on_wish || GA.type === 'g' && ignore_on_group || min_entries === 0 || GA.entries >= min_entries)
 )
 {
 rq({
